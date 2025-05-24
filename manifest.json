@@ -1,0 +1,11 @@
+{
+	"id": "position-document",
+	"name": "Position Open Document",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "定位已打开的文档",
+	"author": "hubz",
+	"authorUrl": "",
+	"fundingUrl": "https://ko-fi.com/yourname",
+	"isDesktopOnly": false
+}
