@@ -1,9 +1,9 @@
 {
-	"id": "position-document",
-	"name": "Position Open Document",
-	"version": "1.0.0",
+	"id": "obsidian-open-in-new-tab",
+	"name": "Open In New Tab",
+	"version": "1.1.0",
 	"minAppVersion": "0.15.0",
-	"description": "定位已打开的文档",
+	"description": "在新标签页中打开文档，如果文档已打开则定位到指定位置",
 	"author": "hubz",
 	"authorUrl": "",
 	"fundingUrl": "https://ko-fi.com/yourname",
