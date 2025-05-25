@@ -27,7 +27,16 @@ export default class OpenInNewTabPlugin extends Plugin {
 	reloadCache() {
 		this.app.workspace.iterateAllLeaves((leaf) => {
 			const file = (leaf.view as any)?.file;
-			this.openedFileCache[file.path] = leaf;
+			let tmpPath = null;
+			if (file === undefined) {
+				tmpPath = leaf.view.getState().file
+			} else {
+				tmpPath = file.path;
+			}
+			if (!this.openedFileCache[tmpPath]) {
+				// 缓存已打开的文件
+				this.openedFileCache[tmpPath] = leaf;
+			}
 		})
 	}
 
