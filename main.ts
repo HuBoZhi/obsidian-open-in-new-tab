@@ -22,9 +22,15 @@ export default class OpenInNewTabPlugin extends Plugin {
 		this.monkeyPatchOpenFile(); // 添加文件打开的猴子补丁
 		this.addMenuItem(); // 添加右键菜单项
 		this.reloadCache(); // 重新加载缓存
+		// 监听文件关闭事件，关闭文件时清理这个文件的缓存
+		this.app.workspace.on("active-leaf-change", (leaf) => {
+			this.reloadCache();
+		})
+
 	}
 
 	reloadCache() {
+		this.openedFileCache = {}; // 清空缓存
 		this.app.workspace.iterateAllLeaves((leaf) => {
 			const file = (leaf.view as any)?.file;
 			let tmpPath = null;
@@ -38,12 +44,30 @@ export default class OpenInNewTabPlugin extends Plugin {
 				this.openedFileCache[tmpPath] = leaf;
 			}
 		})
+
+		for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+			const file = (leaf.view as any)?.file;
+			let tmpPath = null;
+			if (file === undefined) {
+				tmpPath = leaf.view.getState().file
+			} else {
+				tmpPath = file.path;
+			}
+			if (!tmpPath) {
+				continue;
+			}
+			if (!this.openedFileCache[tmpPath]) {
+				// 缓存已打开的文件
+				this.openedFileCache[tmpPath] = leaf;
+			}
+		}
 	}
 
 
 	// 插件卸载时调用
 	onunload() {
 		this.uninstallMonkeyPatchOpenFile && this.uninstallMonkeyPatchOpenFile(); // 卸载猴子补丁
+		this.openedFileCache = {}; // 清空缓存
 		console.log("unloading " + this.manifest.name + " plugin");
 	}
 
@@ -118,6 +142,7 @@ export default class OpenInNewTabPlugin extends Plugin {
 
 	// 为文件打开功能添加猴子补丁
 	monkeyPatchOpenFile() {
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const pluginInstance = this;
 		this.uninstallMonkeyPatchOpenFile = around(WorkspaceLeaf.prototype, {
 			openFile(originalOpenFile) {
@@ -131,7 +156,7 @@ export default class OpenInNewTabPlugin extends Plugin {
 					const isEmptyLeaf = ((this.getViewState()) == null ? void 0 : this.getViewState().type) == "empty";
 
 					// 获取 openState 的状态
-					let openStateState = openState == null ? void 0 : openState.state;
+					const openStateState = openState == null ? void 0 : openState.state;
 					// 检查是否存在模式（mode）并且当前 WorkspaceLeaf 是否为空
 					const hasMode = (openStateState == null ? 0 : openStateState.mode);
 					if (hasMode && isEmptyLeaf) {
@@ -139,11 +164,11 @@ export default class OpenInNewTabPlugin extends Plugin {
 					}
 
 					// 获取当前活动文件
-					let activeFile = pluginInstance.app.workspace.getActiveFile();
+					const activeFile = pluginInstance.app.workspace.getActiveFile();
 
 					// 获取 openState 的 eState 和子路径（subpath）
-					let openStateEState = openState == null ? void 0 : openState.eState;
-					let openStateEStateSubpath = openStateEState == null ? 0 : openStateEState.subpath;
+					const openStateEState = openState == null ? void 0 : openState.eState;
+					const openStateEStateSubpath = openStateEState == null ? 0 : openStateEState.subpath;
 					// 如果文件路径与活动文件路径相同且存在子路径，执行默认打开行为
 					if (file.path == (activeFile == null ? void 0 : activeFile.path) && openStateEStateSubpath) {
 						return executeDefaultBehavior();
