@@ -29,36 +29,49 @@ export default class OpenInNewTabPlugin extends Plugin {
 
 	}
 
+	checkUn(o: any): boolean {
+		// 检查任意对象数组元素不为null,undefined
+		return o !== undefined && o !== null;
+
+	}
+
 	reloadCache() {
 		this.openedFileCache = {}; // 清空缓存
 		this.app.workspace.iterateAllLeaves((leaf) => {
 			const file = (leaf.view as any)?.file;
 			let tmpPath = null;
-			if (file === undefined) {
-				tmpPath = leaf.view.getState().file
-			} else {
+			if (this.checkUn(file)) {
 				tmpPath = file.path;
 			}
-			if (!this.openedFileCache[tmpPath]) {
-				// 缓存已打开的文件
-				this.openedFileCache[tmpPath] = leaf;
+
+			if (tmpPath === "" || tmpPath === null || tmpPath === undefined) {
+				tmpPath = leaf.view.getState().file
+			}
+
+			if (!(tmpPath === "" || tmpPath === null || tmpPath === undefined)) {
+				if (!this.openedFileCache[tmpPath]) {
+					// 缓存已打开的文件
+					this.openedFileCache[tmpPath] = leaf;
+				}
 			}
 		})
 
 		for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
 			const file = (leaf.view as any)?.file;
 			let tmpPath = null;
-			if (file === undefined) {
-				tmpPath = leaf.view.getState().file
-			} else {
+			if (this.checkUn(file)) {
 				tmpPath = file.path;
 			}
-			if (!tmpPath) {
-				continue;
+
+			if (tmpPath === "" || tmpPath === null || tmpPath === undefined) {
+				tmpPath = leaf.view.getState().file
 			}
-			if (!this.openedFileCache[tmpPath]) {
-				// 缓存已打开的文件
-				this.openedFileCache[tmpPath] = leaf;
+
+			if (!(tmpPath === "" || tmpPath === null || tmpPath === undefined)) {
+				if (!this.openedFileCache[tmpPath]) {
+					// 缓存已打开的文件
+					this.openedFileCache[tmpPath] = leaf;
+				}
 			}
 		}
 	}
@@ -99,21 +112,23 @@ export default class OpenInNewTabPlugin extends Plugin {
 		for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
 			const file = (leaf.view as any)?.file;
 			let tmpPath = null;
-			if (file === undefined) {
-				tmpPath = leaf.view.getState().file
-			} else {
+			if (this.checkUn(file)) {
 				tmpPath = file.path;
 			}
-			if (!tmpPath) {
-				continue;
+
+			if (tmpPath === "" || tmpPath === null || tmpPath === undefined) {
+				tmpPath = leaf.view.getState().file
 			}
-			if (!this.openedFileCache[tmpPath]) {
-				// 缓存已打开的文件
-				this.openedFileCache[tmpPath] = leaf;
-			}
-			if (tmpPath === path) {
-				// 如果找到已打开的文件，返回该标签页
-				existingLeaf = leaf;
+
+			if (!(tmpPath === "" || tmpPath === null || tmpPath === undefined)) {
+				if (!this.openedFileCache[tmpPath]) {
+					// 缓存已打开的文件
+					this.openedFileCache[tmpPath] = leaf;
+				}
+				if (tmpPath === path) {
+					// 如果找到已打开的文件，返回该标签页
+					existingLeaf = leaf;
+				}
 			}
 		}
 		if (existingLeaf) {
@@ -123,18 +138,23 @@ export default class OpenInNewTabPlugin extends Plugin {
 		this.app.workspace.iterateAllLeaves((leaf) => {
 			const file = (leaf.view as any)?.file;
 			let tmpPath = null;
-			if (file === undefined) {
-				tmpPath = leaf.view.getState().file
-			} else {
+			if (this.checkUn(file)) {
 				tmpPath = file.path;
 			}
-			if (!this.openedFileCache[tmpPath]) {
-				// 缓存已打开的文件
-				this.openedFileCache[tmpPath] = leaf;
+
+			if (tmpPath === "" || tmpPath === null || tmpPath === undefined) {
+				tmpPath = leaf.view.getState().file
 			}
-			if (tmpPath === path) {
-				// 如果找到已打开的文件，返回该标签页
-				existingLeaf = leaf;
+
+			if (!(tmpPath === "" || tmpPath === null || tmpPath === undefined)) {
+				if (!this.openedFileCache[tmpPath]) {
+					// 缓存已打开的文件
+					this.openedFileCache[tmpPath] = leaf;
+				}
+				if (tmpPath === path) {
+					// 如果找到已打开的文件，返回该标签页
+					existingLeaf = leaf;
+				}
 			}
 		})
 		return existingLeaf;
